@@ -8,10 +8,17 @@ if (!defined('ABSPATH')) {
 class PostNetwork
 {
 
-	private $options;
-	protected $option_name;
-	protected $option_name_sub;
+    private $options;
+    protected $option_name;
+    protected $option_name_sub;
 
+    public function __construct() {
+        add_action('admin_menu', array($this, 'pn_add_option_setting_page'));
+        add_action('admin_init', array($this, 'pn_page_init'));
+        add_filter('plugin_action_links', array($this, 'pn_action_links'), 10, 2);
+        $this->option_name = 'post_network';
+        $this->option_name_sub = 'post_network_settings';
+    }
 
 	public function __construct() {
 		add_action('admin_menu', array($this, 'pn_add_option_setting_page'));
@@ -45,11 +52,11 @@ class PostNetwork
 		return $links;
 	}
 
-	/*
-	==================================
-	settings page
-	==================================
-	*/
+    /*
+    ==================================
+    settings page
+    ==================================
+     */
 
 	public function pn_page_init() {
 		$this->options = get_option($this->option_name);
@@ -71,6 +78,11 @@ class PostNetwork
 		register_setting($this->option_name, $this->option_name, array($this, 'pn_sanitize'));
 	}
 
+    /*
+    ==================================
+    settings page view
+    ==================================
+     */
 
 	/*
 	==================================
@@ -97,13 +109,13 @@ class PostNetwork
 			</form>
 		</div>
 		<?php
-	}
+}
 
-	/*
-	==================================
-	main page view
-	==================================
-	*/
+    /*
+    ==================================
+    main page view
+    ==================================
+     */
 
 	public function pn_create_main_page() {
 		?>
@@ -208,7 +220,7 @@ class PostNetwork
 			</script>
 		</div>
 		<?php
-}
+	}
 
 	public function pn_set_options_main() {
 		//https://visjs.github.io/vis-network/docs/network/#options
@@ -310,11 +322,12 @@ class PostNetwork
 		return apply_filters('post_network_options_physics', $optionsPhysics);
 	}
 
-	/*
-	==================================
-	functions
-	==================================
-	*/
+    public function pn_set_options_main() {
+        //https://visjs.github.io/vis-network/docs/network/#options
+        $optionsMain = array(
+            'autoResize' => true,
+        );
+	}
 
 	/**
 	 * Create edge
@@ -331,6 +344,7 @@ class PostNetwork
 
 		return $array;
 	}
+	
 	/**
 	 * Create node.
 	 *
@@ -439,15 +453,32 @@ class PostNetwork
 				'section_id' => 'graph',
 			),
 		);
-
-		return $array;
 	}
 
-	/*
-	==================================
-	callbacks
-	==================================
-	*/
+    public function pn_set_options_edges() {
+        //https://visjs.github.io/vis-network/docs/network/edges.html
+        $optionsEdges = array(
+            'edges' => array(
+                'arrows' => array(
+                    'to' => array(
+                        'enabled' => true,
+                    ),
+                ),
+            ),
+        );
+        return apply_filters('post_network_options_edges', $optionsEdges);
+    }
+
+    public function pn_set_options_groups() {
+        //https://visjs.github.io/vis-network/docs/network/groups.html        
+            $optionsGroups = array(
+                'groups' => array(
+                    'useDefaultGroups' => true,
+                ),
+            
+        );
+        return apply_filters('post_network_options_groups', $optionsGroups);
+    }
 
 	public function pn_select_callback($args) {
 		$option_value = isset($this->options[$args['id']]) ? $this->options[$args['id']] : '';
@@ -478,11 +509,9 @@ class PostNetwork
 		<input type="hidden" name="<?php echo esc_attr($this->option_name); ?>[<?php echo esc_attr($args['id']); ?>]" value="0">
 		<input type="checkbox" id="<?php echo esc_attr($args['id']); ?>" name="<?php echo esc_attr($this->option_name); ?>[<?php echo esc_attr($args['id']); ?>]" value="1"<?php checked($this->options[$args['id']], 1);?>>
 		<?php if (!empty($args['description'])): ?>
-		<p><?php echo esc_attr($args['description']); ?></p>
-		<?php endif;?>
-		<?php
+			<p><?php echo esc_attr($args['description']); ?></p>
+		<?php endif;
 	}
-
 }
 
 /*
