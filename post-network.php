@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
+
 /**
  * Include includes directiory
  */
@@ -39,3 +41,26 @@ function pn_theme_enqueue_scripts() {
 	wp_enqueue_script( 'visjs', plugins_url( '/js/vis-network.min.js', __FILE__ ) );
 }
 add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_scripts' );
+
+
+
+/**
+ * activate
+ */
+function pn_activation()
+{
+	if ( ! get_option( PostNetwork::pn_get_option_name() ) ) {
+		PostNetwork::pn_option_init();
+	}
+}
+
+register_activation_hook(__FILE__, 'pn_activation');
+
+
+/**
+ * Load
+ */
+
+if ( is_admin() ) {
+	new PostNetwork();
+}
