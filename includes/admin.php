@@ -17,7 +17,7 @@ class PostNetwork
 		add_filter('plugin_action_links', array( $this, 'pn_action_links' ), 10, 2);
   }
   
-	public function add_option_setting_page() {
+	public function pn_add_option_setting_page() {
 		add_menu_page( 'Post Network', 'Post Network', 'manage_options', $this->pn_get_option_name(), array( $this, 'pn_create_main_page' ), 'dashicons-networking', 99 );
 		add_submenu_page( $this->pn_get_option_name(), 'Visualize', 'Visualize', 'manage_options', $this->pn_get_option_name(), array( $this, 'pn_create_main_page' ) );
 		add_submenu_page( $this->pn_get_option_name(), 'Settings', 'Settings', 'manage_options', $this->pn_get_option_name_sub(), array( $this, 'pn_create_settings_page' ) );
