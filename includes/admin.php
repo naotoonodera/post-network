@@ -7,26 +7,30 @@ if (!defined('ABSPATH')) {
 
 class PostNetwork
 {
+	private $options;
+	protected static $option_name = 'post_network';
+	protected static $option_name_sub = 'post_network_settings';
 
-    private $options;
-    protected $option_name;
-    protected $option_name_sub;
-
-    public function __construct() {
-        add_action('admin_menu', array($this, 'pn_add_option_setting_page'));
-        add_action('admin_init', array($this, 'pn_page_init'));
-        add_filter('plugin_action_links', array($this, 'pn_action_links'), 10, 2);
-        $this->option_name = 'post_network';
-        $this->option_name_sub = 'post_network_settings';
-    }
-
-	public function pn_add_option_setting_page() {
-		add_menu_page('Post Network', 'Post Network', 'manage_options', $this->option_name, array($this, 'pn_create_main_page'), 'dashicons-networking', 99);
-		add_submenu_page($this->option_name, 'Visualize', 'Visualize', 'manage_options', $this->option_name, array($this, 'pn_create_main_page'));
-		add_submenu_page($this->option_name, 'Settings', 'Settings', 'manage_options', $this->option_name_sub, array($this, 'pn_create_settings_page'));
+	public function __construct() {
+		add_action( 'admin_menu', array( $this, 'pn_add_option_setting_page' ) );
+		add_action( 'admin_init', array( $this, 'pn_page_init' ) );
+		add_filter('plugin_action_links', array( $this, 'pn_action_links' ), 10, 2);
+  }
+  
+	public function add_option_setting_page() {
+		add_menu_page( 'Post Network', 'Post Network', 'manage_options', $this->pn_get_option_name(), array( $this, 'pn_create_main_page' ), 'dashicons-networking', 99 );
+		add_submenu_page( $this->pn_get_option_name(), 'Visualize', 'Visualize', 'manage_options', $this->pn_get_option_name(), array( $this, 'pn_create_main_page' ) );
+		add_submenu_page( $this->pn_get_option_name(), 'Settings', 'Settings', 'manage_options', $this->pn_get_option_name_sub(), array( $this, 'pn_create_settings_page' ) );
 	}
 
+	public static function pn_get_option_name() {
+		return self::$option_name;
+	}
 
+	public static function pn_get_option_name_sub() {
+		return self::$option_name_sub;
+	}
+  
 	/*
 	==================================
 	Plugin page
@@ -44,30 +48,31 @@ class PostNetwork
 		return $links;
 	}
 
-    /*
-    ==================================
-    settings page
-    ==================================
-     */
+  /*
+  ==================================
+  settings page
+  ==================================
+   */
 
 	public function pn_page_init() {
-		$this->options = get_option($this->option_name);
+		$this->options = get_option( $this->pn_get_option_name() );
 
-		if (isset($_GET['page']) && $_GET['page'] === $this->option_name_sub) {
-			add_settings_section('graph', __('Graph settings', 'post-network'), '', $this->option_name);
+		if ( isset( $_GET['page'] ) && $_GET['page'] === $this->pn_get_option_name_sub() ) {
+			add_settings_section( 'graph', __( 'Graph settings', 'post-network' ), '', $this->pn_get_option_name() );
+
 		}
 
 		$settings = $this->pn_get_fields();
 
-		foreach ( $settings as $key => $value) {
-			if (!isset($value['id'], $value['title'], $value['callback'], $value['section_id'])) {
+		foreach ( $settings as $key => $value ) {
+			if ( ! isset( $value['id'], $value['title'], $value['callback'], $value['section_id'], $value['default'] ) ) {
 				continue;
 			}
 
-			add_settings_field($value['id'], $value['title'], array($this, $value['callback']), $this->option_name, $value['section_id'], $value);
+			add_settings_field( $value['id'], $value['title'], array( $this, $value['callback'] ), $this->pn_get_option_name(), $value['section_id'], $value );
 		}
 
-		register_setting($this->option_name, $this->option_name, array($this, 'pn_sanitize'));
+		register_setting( $this->pn_get_option_name(), $this->pn_get_option_name(), array( $this, 'pn_sanitize' ) );
 	}
 
     /*
@@ -94,9 +99,9 @@ class PostNetwork
 			<h2>Post Network settings</h2>
 			<form method="post" action="options.php">
 			<?php
-				settings_fields($this->option_name);
-				do_settings_sections($this->option_name);
-				submit_button(__('Save', 'post-network'));
+				settings_fields( $this->pn_get_option_name() );
+				do_settings_sections( $this->pn_get_option_name() );
+				submit_button( __( 'Save', 'post-network' ) );
 			?>
 			</form>
 		</div>
@@ -126,7 +131,9 @@ class PostNetwork
 
 					$array_post_type = array('post');
 
-
+				if ( $this->options['graph_include_page']) {
+					$array_post_type[] = 'page';
+				}
 
 
 					// WP＿Query args
@@ -394,10 +401,10 @@ class PostNetwork
 		return $match[0];
 	}
 
-	public function pn_sanitize($input) {
-		$existing = get_option($this->option_name);
+	public function pn_sanitize( $input ) {
+		$existing = get_option( $this->pn_get_option_name() );
 
-		if (!$existing) {
+    if (!$existing) {
 			return $input;
 		}
 
@@ -412,7 +419,8 @@ class PostNetwork
 	==================================
 	*/
 
-	public function pn_get_fields() {
+	public static function pn_get_fields() {
+
 		$array = array(
 			array(
 				'id' => 'graph_label',
@@ -424,62 +432,78 @@ class PostNetwork
 					'post_title' => __('Post title', 'post-network'),
 					'none' => __('None', 'post-network'),
 				),
+				'default'    => 'post_id',
+			),
+			array(
+				'id'         => 'graph_include_page',
+				'title'      => __( 'Include pages', 'post-network' ),
+				'callback'   => 'boolean_callback',
+				'section_id' => 'graph',
+				'default'    =>  0,
 			),
 			array(
 				'id' => 'graph_disable_physics',
 				'title' => __('Disable physics simulation', 'post-network'),
 				'callback' => 'pn_boolean_callback',
 				'section_id' => 'graph',
+				'default'    =>  0,
 			),
 			array(
-				'id' => 'graph_post_status',
-				'title' => __('Include published post only', 'post-network'),
-				'callback' => 'pn_boolean_callback',
+				'id'         => 'graph_post_status',
+				'title'      => __( 'Include published posts only', 'post-network' ),
+				'callback'   => 'pn_boolean_callback',
 				'section_id' => 'graph',
+				'default'    =>  0,
 			),
 		);
         return $array;
 	}    
 
-	public function pn_select_callback($args) {
-		$option_value = isset($this->options[$args['id']]) ? $this->options[$args['id']] : '';
-		$args_value = $args['value'];
-		$cnt = 0;
+	public static function pn_option_init() {
+		$fields = self::pn_get_fields();
+		$default_settings = array_column( $fields, 'default', 'id' );
+		update_option( self::$option_name, $default_settings );
+	}
+
+	/*
+	==================================
+	callbacks
+	==================================
+	*/
+
+	public function pn_select_callback( $args ) {
+		$option_value = isset( $this->options[ $args['id'] ] ) ? $this->options[ $args['id'] ] : '';
+		$args_value   = $args['value'];
 		?>
-		<select name="<?php echo esc_attr($this->option_name); ?>[<?php echo esc_attr($args['id']); ?>]" id="<?php echo esc_attr($args['id']); ?>">
-			<?php foreach ($args_value as $key => $value): ?>
-				<?php $checked_flag = (empty($option_value) && $cnt == 0 || $key === $option_value) ? true : false;?>
-				<option value="<?php echo esc_attr($key); ?>"
-				<?php
-					if ($checked_flag) {
-						echo 'selected';
-					}
-				?>
-				><?php echo esc_attr($value); ?></option>
-				<?php $cnt++;?>
-			<?php endforeach;?>
-		</select>
-		<?php if (!empty($args['description'])): ?>
-			<p><?php echo esc_attr($args['description']); ?></p>
+		<select name="<?php echo esc_attr( $this->pn_get_option_name() ); ?>[<?php echo esc_attr( $args['id'] ); ?>]" id="<?php echo esc_attr( $args['id'] ); ?>">
+				<?php foreach ( $args_value as $key => $value ) : ?>
+					<?php $checked_flag = ( empty( $option_value ) && $cnt == 0 || $key === $option_value ) ? true : false; ?>
+				<option value="<?php echo esc_attr( $key ); ?>" 
+										<?php
+										if ( $checked_flag ) {
+											echo 'selected';}
+										?>
+					><?php echo esc_attr( $value ); ?></option>
+					<?php $cnt++; ?>
+				<?php endforeach; ?>
+		</select>										
+		<?php if ( ! empty( $args['description'] ) ) : ?>
+			<p><?php echo esc_attr( $args['description'] ); ?></p>
 		<?php endif;
+    return $array;
 	}
 
 	public function pn_boolean_callback($args) {
 		$option_value = isset($this->options[$args['id']]) ? esc_attr($this->options[$args['id']]) : '';
 		?>
-		<input type="hidden" name="<?php echo esc_attr($this->option_name); ?>[<?php echo esc_attr($args['id']); ?>]" value="0">
-		<input type="checkbox" id="<?php echo esc_attr($args['id']); ?>" name="<?php echo esc_attr($this->option_name); ?>[<?php echo esc_attr($args['id']); ?>]" value="1"<?php checked($this->options[$args['id']], 1);?>>
-		<?php if (!empty($args['description'])): ?>
-			<p><?php echo esc_attr($args['description']); ?></p>
-		<?php endif;
-	}
-}
 
-/*
-==================================
-load
-==================================
- */
+		<input type="hidden" name="<?php echo esc_attr( $this->pn_get_option_name() ); ?>[<?php echo esc_attr( $args['id'] ); ?>]" value="0">
+		<input type="checkbox" id="<?php echo esc_attr( $args['id'] ); ?>" name="<?php echo esc_attr( $this->pn_get_option_name() ); ?>[<?php echo esc_attr( $args['id'] ); ?>]" value="1"<?php checked( $this->options[ $args['id'] ], 1 ); ?>>
+		<?php if ( ! empty( $args['description'] ) ) : ?>
+		  <p><?php echo esc_attr( $args['description'] ); ?></p>
+		<?php endif;		
+  }
+}
 
 if (is_admin()) {
 	$option_settings_page = new PostNetwork();
