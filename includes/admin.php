@@ -437,7 +437,7 @@ class PostNetwork
 			array(
 				'id'         => 'graph_include_page',
 				'title'      => __( 'Include pages', 'post-network' ),
-				'callback'   => 'boolean_callback',
+				'callback'   => 'pn_boolean_callback',
 				'section_id' => 'graph',
 				'default'    =>  0,
 			),
