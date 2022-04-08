@@ -75,12 +75,6 @@ class PostNetwork
 		register_setting( $this->pn_get_option_name(), $this->pn_get_option_name(), array( $this, 'pn_sanitize' ) );
 	}
 
-    /*
-    ==================================
-    settings page view
-    ==================================
-     */
-
 	/*
 	==================================
 	settings page view
