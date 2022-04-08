@@ -474,6 +474,7 @@ class PostNetwork
 	public function pn_select_callback( $args ) {
 		$option_value = isset( $this->options[ $args['id'] ] ) ? $this->options[ $args['id'] ] : '';
 		$args_value   = $args['value'];
+		$cnt = 0;
 		?>
 		<select name="<?php echo esc_attr( $this->pn_get_option_name() ); ?>[<?php echo esc_attr( $args['id'] ); ?>]" id="<?php echo esc_attr( $args['id'] ); ?>">
 				<?php foreach ( $args_value as $key => $value ) : ?>
@@ -490,7 +491,7 @@ class PostNetwork
 		<?php if ( ! empty( $args['description'] ) ) : ?>
 			<p><?php echo esc_attr( $args['description'] ); ?></p>
 		<?php endif;
-    return $array;
+    
 	}
 
 	public function pn_boolean_callback($args) {
