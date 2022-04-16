@@ -39,6 +39,7 @@ add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_styles' );
  */
 function pn_theme_enqueue_scripts() {
 	wp_enqueue_script( 'visjs', plugins_url( '/js/vis-network.min.js', __FILE__ ) );
+	wp_enqueue_script( 'pn', plugins_url( '/js/pn.js', __FILE__ ) );
 }
 add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_scripts' );
 
