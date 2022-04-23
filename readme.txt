@@ -39,6 +39,12 @@ You can also set the options for displaying the graph from "Post Network->Settig
 
 == Changelog ==
 
+= 1.3.0 =
+* Add "Include pages" option to setting
+* Hooks added
+* Fixed php notice errors
+* Code refactoring
+
 = 1.2.0 =
 * Add "None" option to Graph label
 * Display loading icon while drawing the graph
