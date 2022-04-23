@@ -137,6 +137,9 @@ class PostNetwork {
 
 					$query = new WP_Query( $args );
 
+					$to_post_ids = array();
+					$edges = array();
+
 					if ( $query->have_posts() ) {
 						while ( $query->have_posts() ) {
 							$query->the_post();
@@ -145,8 +148,6 @@ class PostNetwork {
 							$nodes[]   = $this->pn_create_node( $post->ID, get_the_category( $post->ID )[0]->term_id );
 							$links     = $this->pn_get_all_links( do_shortcode( $post->post_content ) );
 							$ids       = $this->pn_urls_to_post_ids( $links );
-							$to_post_ids = array();
-							$edges = array();
 
 							if ( $ids ) {
 								foreach ( $ids as $key => $post_id ) {
