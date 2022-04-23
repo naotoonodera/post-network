@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /**
- * Include includes directiory
+ * Include includes directory
  */
 
 foreach ( glob( dirname( __FILE__ ) . '/includes/*.php' ) as $file ) {
@@ -39,6 +39,7 @@ add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_styles' );
  */
 function pn_theme_enqueue_scripts() {
 	wp_enqueue_script( 'visjs', plugins_url( '/js/vis-network.min.js', __FILE__ ) );
+	wp_enqueue_script( 'pn', plugins_url( '/js/pn.js', __FILE__ ) );
 }
 add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_scripts' );
 
@@ -47,14 +48,13 @@ add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_scripts' );
 /**
  * activate
  */
-function pn_activation()
-{
+function pn_activation() {
 	if ( ! get_option( PostNetwork::pn_get_option_name() ) ) {
 		PostNetwork::pn_option_init();
 	}
 }
 
-register_activation_hook(__FILE__, 'pn_activation');
+register_activation_hook( __FILE__, 'pn_activation' );
 
 
 /**
