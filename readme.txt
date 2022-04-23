@@ -4,7 +4,7 @@ Contributors:naotoonodera
 Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
 Requires at least: 4.9
 Tested up to: 5.9
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.0
@@ -18,8 +18,11 @@ Post Network makes it easier to find isolated articles on your site by visualizi
 
 **Usage**
 
-After installing the plugin, select "Post Network->Visualize" from the admin panel to visualize the relationship between the posts.
-You can also set the options for displaying the graph from "Post Network->Settigs" in the admin panel.
+After installing the plugin, select 
+"Post Network->Visualize" from the admin panel to visualize the relationship between the posts.
+
+You can also set the options for displaying the graph from 
+"Post Network->Settigs" in the admin panel.
 
 
 == Installation ==
@@ -38,6 +41,9 @@ You can also set the options for displaying the graph from "Post Network->Settig
 
 
 == Changelog ==
+
+= 1.3.1 =
+* Fixed php notice errors
 
 = 1.3.0 =
 * Add "Include pages" option to setting
