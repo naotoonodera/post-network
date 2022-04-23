@@ -77,14 +77,13 @@ function pn_create(
 	 */
 
 	pn.on(
-		"click",
+		"doubleClick",
 		function (properties) {
 			if (Object.keys( properties.nodes ).length !== 0) {
 				var ids           = properties.nodes;
 				var clickedNodes  = nodes.get( ids );
 				var element       = document.getElementById( clickedNodes[0].id );
-				var elemtop       =
-				element.getBoundingClientRect().top + window.pageYOffset;
+				var elemtop       = element.getBoundingClientRect().top + window.pageYOffset;
 				var targetTop     = elemtop - 32; // - admin bar height
 				var scrollOptions = {
 					left: 0,
@@ -97,7 +96,7 @@ function pn_create(
 		}
 	);
 
-	pn.on( "doubleClick", function (properties) {} );
+	pn.on( "click", function (properties) {} );
 	pn.on( "oncontext", function (properties) {} );
 	pn.on( "dragStart", function (properties) {} );
 	pn.on( "dragging", function (properties) {} );
@@ -106,7 +105,7 @@ function pn_create(
 	pn.on( "controlNodeDragEnd", function (properties) {} );
 	pn.on( "zoom", function (properties) {} );
 	pn.on( "showPopup", function (properties) {} );
-	pn.on( "hidePopup", function () {} );
+	pn.on( "hidePopup", function (properties) {} );
 	pn.on( "select", function (properties) {} );
 	pn.on( "selectNode", function (properties) {} );
 	pn.on( "selectEdge", function (properties) {} );
