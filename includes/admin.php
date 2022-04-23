@@ -50,7 +50,7 @@ class PostNetwork {
 
 	/*
 	==================================
-	Settings page
+	Settings
 	==================================
 	*/
 
@@ -98,7 +98,7 @@ class PostNetwork {
 
 	/*
 	==================================
-	Main view
+	Visualize
 	==================================
 	 */
 
@@ -118,8 +118,8 @@ class PostNetwork {
 				<?php
 
 					$array_post_type = array( 'post' );
-
-				if ( $this->options['graph_include_page'] ) {
+				// settings : graph_include_page
+				if ( isset( $this->options['graph_include_page'] ) && true === $this->options['graph_include_page'] ) {
 					$array_post_type[] = 'page';
 				}
 
@@ -129,7 +129,9 @@ class PostNetwork {
 						'posts_per_page' => -1,
 					);
 
-					if ( $this->options['graph_post_status'] ) {
+					// settings : graph_post_status
+
+					if ( isset($this->options['graph_post_status'] ) &&  true === $this->options['graph_post_status'] ) {
 						$args = $args + array( 'post_status' => 'publish' );
 					}
 
@@ -143,6 +145,8 @@ class PostNetwork {
 							$nodes[]   = $this->pn_create_node( $post->ID, get_the_category( $post->ID )[0]->term_id );
 							$links     = $this->pn_get_all_links( do_shortcode( $post->post_content ) );
 							$ids       = $this->pn_urls_to_post_ids( $links );
+							$to_post_ids = array();
+							$edges = array();
 
 							if ( $ids ) {
 								foreach ( $ids as $key => $post_id ) {
@@ -441,8 +445,8 @@ class PostNetwork {
 				'enabled' => true,
 			),
 		);
-
-		if ( $this->options['graph_disable_physics'] ) {
+		// settings : graph_disable_physics
+		if ( isset($this->options['graph_disable_physics'] ) && true === $this->options['graph_disable_physics'] ) {
 			$optionsPhysics['physics'] = false;
 		}
 		return apply_filters( 'post_network_options_physics', $optionsPhysics );
