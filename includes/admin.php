@@ -119,7 +119,7 @@ class PostNetwork {
 
 					$array_post_type = array( 'post' );
 				// settings : graph_include_page
-				if ( isset( $this->options['graph_include_page'] ) && true === $this->options['graph_include_page'] ) {
+				if ( isset( $this->options['graph_include_page'] ) && $this->options['graph_include_page'] ) {
 					$array_post_type[] = 'page';
 				}
 
@@ -131,7 +131,7 @@ class PostNetwork {
 
 					// settings : graph_post_status
 
-					if ( isset($this->options['graph_post_status'] ) &&  true === $this->options['graph_post_status'] ) {
+					if ( isset($this->options['graph_post_status'] ) &&  $this->options['graph_post_status'] ) {
 						$args = $args + array( 'post_status' => 'publish' );
 					}
 
@@ -447,7 +447,7 @@ class PostNetwork {
 			),
 		);
 		// settings : graph_disable_physics
-		if ( isset($this->options['graph_disable_physics'] ) && true === $this->options['graph_disable_physics'] ) {
+		if ( isset($this->options['graph_disable_physics'] ) && $this->options['graph_disable_physics'] ) {
 			$optionsPhysics['physics'] = false;
 		}
 		return apply_filters( 'post_network_options_physics', $optionsPhysics );
