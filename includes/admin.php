@@ -117,11 +117,12 @@ class PostNetwork {
 				</tr>
 				<?php
 
-					$array_post_type = array( 'post' );
-				// settings : graph_include_page
-				if ( isset( $this->options['graph_include_page'] ) && $this->options['graph_include_page'] ) {
-					$array_post_type[] = 'page';
-				}
+					// settings : graph_post_type
+					if ($this->options['graph_post_type']) {
+						$array_post_type = $this->options['graph_post_type'];
+					} else {
+						$array_post_type = array('post');
+					}
 
 					// WP＿Query args
 					$args = array(
@@ -227,7 +228,7 @@ class PostNetwork {
 		);
 
 		if ( 'post_title' === $this->options['graph_label'] ) {
-			$array = $array + array( 'label' => (string) get_the_title( $post_id ) );
+			$array = $array + array( 'label' => (string) get_the_title( $post_id ) ) ;
 		} elseif ( 'post_id' === $this->options['graph_label'] ) {
 			$array = $array + array( 'label' => (string) $post_id );
 			$array = $array + array( 'title' => get_the_title( $post_id ) );
@@ -235,6 +236,13 @@ class PostNetwork {
 			$array = $array + array( 'label' => '' );
 			$array = $array + array( 'title' => get_the_title( $post_id ) );
 		}
+
+		// settings : graph_indicate_post_status
+		if ( 'none' != $this->options['graph_label'] && isset( $this->options['graph_indicate_post_status'] ) && $this->options['graph_indicate_post_status'] ) {
+			$array['label'] = $array['label'] . ' (' . get_post_status( $post_id ) . ')';
+		}
+
+		
 
 		return $array;
 	}
@@ -301,6 +309,22 @@ class PostNetwork {
 		);
 
 		return $array;
+	}
+
+
+	/**
+	 * Get theme post type
+	 *
+	 * @param  array $exclude post type to exclude
+	 * @return array $post_type post type
+	 */
+
+	public function pn_get_theme_post_type(array $exclude) {
+
+		$post_type = get_post_types(array('public'=> true));
+		$post_type = array_diff($post_type, $exclude);
+	
+		return $post_type;
 	}
 
 	/*
@@ -459,7 +483,7 @@ class PostNetwork {
 	==================================
 	*/
 
-	public static function pn_get_fields() {
+	public function pn_get_fields() {
 
 		$array = array(
 			array(
@@ -475,13 +499,6 @@ class PostNetwork {
 				'default'    => 'post_id',
 			),
 			array(
-				'id'         => 'graph_include_page',
-				'title'      => __( 'Include pages', 'post-network' ),
-				'callback'   => 'pn_boolean_callback',
-				'section_id' => 'graph',
-				'default'    => 0,
-			),
-			array(
 				'id'         => 'graph_disable_physics',
 				'title'      => __( 'Disable physics simulation', 'post-network' ),
 				'callback'   => 'pn_boolean_callback',
@@ -495,12 +512,28 @@ class PostNetwork {
 				'section_id' => 'graph',
 				'default'    => 0,
 			),
+			array(
+				'id'         => 'graph_indicate_post_status',
+				'title'      => __( 'Indicate post status in label', 'post-network' ),
+				'callback'   => 'pn_boolean_callback',
+				'section_id' => 'graph',
+				'default'    => 0,  
+            ),
+			array(
+				'id'         => 'graph_post_type',
+				'title'      => __( 'Post type to include', 'post-network' ),
+				'callback'   => 'pn_checkbox_callback',
+				'section_id' => 'graph',
+				'value'      => $this->pn_get_theme_post_type(array('attachment')),
+				'default'    => array('post'),  
+            ),
 		);
+
 		return $array;
 	}
 
 	public static function pn_option_init() {
-		$fields           = self::pn_get_fields();
+		$fields           = $this->pn_get_fields();
 		$default_settings = array_column( $fields, 'default', 'id' );
 		update_option( self::$option_name, $default_settings );
 	}
@@ -545,5 +578,47 @@ class PostNetwork {
 		<p><?php echo esc_attr( $args['description'] ); ?></p>
 			<?php
 		endif;
+	}
+
+	public function pn_checkbox_callback( $args ) {
+		$option_value = isset( $this->options[ $args['id'] ] ) ? $this->options[ $args['id'] ] : '';
+		$args_value   = $args['value'];
+		$args_default = $args['default'];
+		?>
+		<?php foreach ( $args_value as $key => $value ) : ?>
+			<?php $array_search_result = array_search( $key, (array) $option_value ); ?>
+			<?php if ( false !== $array_search_result && $array_search_result !== null ) : ?> 
+				<?php $checked_flag = true; ?>
+			<?php elseif ( empty( $option_value ) && ! empty( $args_default ) ) : ?>
+				<?php $array_search_result = array_search( $key, $args_default ); ?>
+				<?php if ( false !== $array_search_result && $array_search_result !== null ) : ?> 
+					<?php $checked_flag = true; ?>
+				<?php else : ?>
+				<?php $checked_flag = false; ?>
+				<?php endif; ?>
+			<?php else : ?>
+					<?php $checked_flag = false; ?>
+			<?php endif; ?>
+
+			<div>
+				<input type="checkbox" id="<?php echo esc_attr( $args['id'] ); ?>" name="<?php echo esc_attr( $this->pn_get_option_name() ); ?>[<?php echo esc_attr( $args['id'] ); ?>][]" value="<?php echo esc_attr( $key ); ?>"  
+				<?php
+				if ( $checked_flag ) {
+					echo 'checked="checked"';}
+				?>
+				<?php
+				if ( ! empty( $args['placeholder'] ) ) {
+					echo 'placeholder="' . esc_attr( $args['placeholder'] ) . '"';}
+				?>
+				/>
+				<?php echo esc_attr( $value ); ?>
+			</div>
+		<?php endforeach; ?>
+
+		<?php if ( ! empty( $args['description'] ) ) : ?>
+			<p><?php echo esc_attr( $args['description'] ); ?></p>
+		<?php endif; ?>
+
+		<?php
 	}
 }

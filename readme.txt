@@ -3,8 +3,8 @@ Author: Naoto Onodera
 Contributors:naotoonodera
 Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
 Requires at least: 4.9
-Tested up to: 5.9
-Stable tag: 1.3.1
+Tested up to: 6.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.0
@@ -19,7 +19,7 @@ Post Network makes it easier to find isolated articles on your site by visualizi
 **Usage**
 
 After installing the plugin, select 
-"Post Network->Visualize" from the admin panel to visualize the relationship between the posts.
+"Post Network->Visualize" from the admin panel.
 
 You can also set the options for displaying the graph from 
 "Post Network->Settigs" in the admin panel.
@@ -38,9 +38,15 @@ You can also set the options for displaying the graph from
 
 1. screenshot-1.png
 2. screenshot-2.png
+3. screenshot-3.png
 
 
 == Changelog ==
+
+= 1.4.0 =
+* Add "Indicate post status in label" to setting
+* Add "Post type to include" to setting ("Include pages" option removed)
+* WordPress 6.0
 
 = 1.3.1 =
 * Fixed php notice errors
