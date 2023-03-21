@@ -533,7 +533,7 @@ class PostNetwork {
 	}
 
 	public static function pn_option_init() {
-		$fields           = $this->pn_get_fields();
+		$fields           = self::pn_get_fields();
 		$default_settings = array_column( $fields, 'default', 'id' );
 		update_option( self::$option_name, $default_settings );
 	}
