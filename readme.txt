@@ -3,11 +3,11 @@ Author: Naoto Onodera
 Contributors:naotoonodera
 Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
 Requires at least: 4.9
-Tested up to: 6.0
-Stable tag: 1.4.0
+Tested up to: 6.1
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Requires PHP: 7.0
+Requires PHP: 8.0
 Donate link: https://www.paypal.com/paypalme/naotoonodera
 
 Visualize post relationships graphically based on internal links
@@ -42,6 +42,11 @@ You can also set the options for displaying the graph from
 
 
 == Changelog ==
+
+= 1.4.1 =
+・Fixed activation error
+・PHP8.0
+・Wordpress 6.1
 
 = 1.4.0 =
 * Add "Indicate post status in label" to setting
