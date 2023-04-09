@@ -319,7 +319,7 @@ class PostNetwork {
 	 * @return array $post_type post type
 	 */
 
-	public function pn_get_theme_post_type(array $exclude) {
+	public static function pn_get_theme_post_type(array $exclude) {
 
 		$post_type = get_post_types(array('public'=> true));
 		$post_type = array_diff($post_type, $exclude);
@@ -477,13 +477,16 @@ class PostNetwork {
 		return apply_filters( 'post_network_options_physics', $optionsPhysics );
 	}
 
+
 	/*
 	==================================
 	Settings fields
 	==================================
 	*/
 
-	public function pn_get_fields() {
+	public static function pn_get_fields() {
+
+		$post_types = self::pn_get_theme_post_type(array('attachment'));
 
 		$array = array(
 			array(
@@ -524,7 +527,7 @@ class PostNetwork {
 				'title'      => __( 'Post type to include', 'post-network' ),
 				'callback'   => 'pn_checkbox_callback',
 				'section_id' => 'graph',
-				'value'      => $this->pn_get_theme_post_type(array('attachment')),
+				'value'      => $post_types,
 				'default'    => array('post'),  
             ),
 		);
