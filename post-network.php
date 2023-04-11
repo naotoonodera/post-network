@@ -6,7 +6,7 @@ Description: Visualize the relationship between articles based on internal links
 Author: Naoto Onodera
 Author URI: https://notondr.com/
 Plugin URI: https://notondr.com/post-network/
-Version: 1.4.1
+Version: 1.4.2
 Text Domain: post-network
 Domain Path: /languages
 */
