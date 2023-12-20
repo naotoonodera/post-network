@@ -1,6 +1,6 @@
 === Post Network ===
-Author: HOKET DEV
-Contributors:naotoonodera
+Author: HOKET
+Contributors:hoket,naotoonodera
 Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
 Requires at least: 4.9
 Tested up to: 6.4
