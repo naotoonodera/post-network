@@ -146,7 +146,11 @@ class PostNetwork {
 							$query->the_post();
 							$post      = get_post();
 							$permalink = get_permalink( $post->ID );
-							$nodes[]   = $this->pn_create_node( $post->ID, get_the_category( $post->ID )[0]->term_id );
+							$categories = get_the_category( $post->ID );
+
+							$category_id = !empty($categories) && isset($categories[0]->term_id) ? $categories[0]->term_id : 0; // no category
+							$nodes[] = $this->pn_create_node( $post->ID, $category_id );
+
 							$links     = $this->pn_get_all_links( do_shortcode( $post->post_content ) );
 							$ids       = $this->pn_urls_to_post_ids( $links );
 

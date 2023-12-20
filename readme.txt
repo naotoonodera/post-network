@@ -1,14 +1,14 @@
 === Post Network ===
-Author: Naoto Onodera
+Author: HOKET DEV
 Contributors:naotoonodera
 Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
 Requires at least: 4.9
-Tested up to: 6.2
-Stable tag: 1.4.2
+Tested up to: 6.4
+Stable tag: 1.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.0
-Donate link: https://www.paypal.com/paypalme/naotoonodera
+
 
 Visualize post relationships graphically based on internal links
 
@@ -42,16 +42,19 @@ You can also set the options for displaying the graph from
 
 
 == Changelog ==
+= 1.4.3 =
+* Fixed some errors
+* Wordpress 6.4
 
 = 1.4.2 =
-・Fixed activation error
-・Wordpress 6.2
+* Fixed activation error
+* Wordpress 6.2
 
 
 = 1.4.1 =
-・Fixed activation error
-・PHP8.0
-・Wordpress 6.1
+* Fixed activation error
+* PHP8.0
+* Wordpress 6.1
 
 = 1.4.0 =
 * Add "Indicate post status in label" to setting

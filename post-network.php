@@ -3,10 +3,10 @@
 /*
 Plugin Name: Post Network
 Description: Visualize the relationship between articles based on internal links.
-Author: Naoto Onodera
-Author URI: https://notondr.com/
-Plugin URI: https://notondr.com/post-network/
-Version: 1.4.2
+Author: HOKET
+Author URI: https://dev.hoket.net/
+Plugin URI: https://dev.hoket.net/blog/post-network/
+Version: 1.4.3
 Text Domain: post-network
 Domain Path: /languages
 */
