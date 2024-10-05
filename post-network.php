@@ -6,7 +6,7 @@ Description: Visualize the relationship between articles based on internal links
 Author: HOKET
 Author URI: https://dev.hoket.net/
 Plugin URI: https://dev.hoket.net/blog/post-network/
-Version: 1.4.3
+Version: 1.5.0
 Text Domain: post-network
 Domain Path: /languages
 */
@@ -14,8 +14,6 @@ Domain Path: /languages
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-
 
 /**
  * Include includes directory
@@ -33,6 +31,7 @@ function pn_theme_enqueue_styles() {
 	wp_enqueue_style( 'pn-style', plugins_url( '/css/style.css', __FILE__ ) );
 }
 add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_styles' );
+add_action( 'wp_enqueue_scripts', 'pn_theme_enqueue_styles' );
 
 /**
  * Enqueue javascript files
@@ -42,6 +41,7 @@ function pn_theme_enqueue_scripts() {
 	wp_enqueue_script( 'pn', plugins_url( '/js/pn.js', __FILE__ ) );
 }
 add_action( 'admin_enqueue_scripts', 'pn_theme_enqueue_scripts' );
+add_action( 'wp_enqueue_scripts', 'pn_theme_enqueue_scripts' );
 
 
 
@@ -60,7 +60,4 @@ register_activation_hook( __FILE__, 'pn_activation' );
 /**
  * Load
  */
-
-if ( is_admin() ) {
-	new PostNetwork();
-}
+PostNetwork::get_instance();
