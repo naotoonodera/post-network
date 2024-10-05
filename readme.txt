@@ -3,8 +3,8 @@ Author: HOKET
 Contributors:hoket,naotoonodera
 Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
 Requires at least: 4.9
-Tested up to: 6.4
-Stable tag: 1.4.3
+Tested up to: 6.6
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.0
@@ -24,11 +24,14 @@ After installing the plugin, select
 You can also set the options for displaying the graph from 
 "Post Network->Settings" in the admin panel.
 
+You can display the graph on the frontend by using a shortcode.
+Simply add the [post-network] shortcode to the page where you want to display the graph.
+
 
 == Installation ==
 
 1. Upload post-network to your /wp-content/plugins/ directory or download through the Plugins page.
-2. Activate the plugin through the ‘Plugins’ menu in WordPress.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
 
 == Frequently asked questions ==
 
@@ -42,19 +45,24 @@ You can also set the options for displaying the graph from
 
 
 == Changelog ==
+= 1.5.0 =
+* Added shortcode
+* WordPress 6.6
+
+
 = 1.4.3 =
 * Fixed some errors
-* Wordpress 6.4
+* WordPress 6.4
 
 = 1.4.2 =
 * Fixed activation error
-* Wordpress 6.2
+* WordPress 6.2
 
 
 = 1.4.1 =
 * Fixed activation error
 * PHP8.0
-* Wordpress 6.1
+* WordPress 6.1
 
 = 1.4.0 =
 * Add "Indicate post status in label" to setting
