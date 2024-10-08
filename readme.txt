@@ -1,7 +1,7 @@
 === Post Network ===
 Author: HOKET
 Contributors:hoket,naotoonodera
-Tags: links, link, internal link, SEO, graph, content analysis, seo plugin
+Tags: SEO, internal links, content visualization, content analysis, link management
 Requires at least: 4.9
 Tested up to: 6.6
 Stable tag: 1.5.0
