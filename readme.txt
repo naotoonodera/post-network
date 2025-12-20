@@ -3,11 +3,11 @@ Author: HOKET
 Contributors:hoket,naotoonodera
 Tags: SEO, internal links, content visualization, content analysis, link management
 Requires at least: 4.9
-Tested up to: 6.6
-Stable tag: 1.5.0
+Tested up to: 6.9
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Requires PHP: 7.0
+Requires PHP: 7.4
 
 
 Visualize post relationships graphically based on internal links
@@ -45,6 +45,12 @@ Simply add the [post-network] shortcode to the page where you want to display th
 
 
 == Changelog ==
+= 1.6.0 =
+* Fixed JavaScript loading errors
+* Updated vis-network.js library to version 9.1.2 (Non-compressed version to prevent double-minification issues).
+* Code refactoring
+* WordPress 6.9
+
 = 1.5.0 =
 * Added shortcode
 * WordPress 6.6
