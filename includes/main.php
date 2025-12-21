@@ -18,6 +18,7 @@ class PostNetwork
         add_action('admin_init', array($this, 'pn_page_init'));
         add_filter('plugin_action_links', array($this, 'pn_action_links'), 10, 2);
         add_shortcode('post_network', array($this, 'pn_render_shortcode'));
+        add_shortcode('post-network', array($this, 'pn_render_shortcode'));
         add_action('init', array($this, 'load_options'));
     }
 
