@@ -6,7 +6,7 @@ Description: Visualize the relationship between articles based on internal links
 Author: HOKET Co., Ltd.
 Author URI: https://dev.hoket.co.jp/
 Plugin URI: https://dev.hoket.co.jp/post-network/
-Version: 1.6.0
+Version: 1.6.1
 Text Domain: post-network
 Domain Path: /languages
 */
