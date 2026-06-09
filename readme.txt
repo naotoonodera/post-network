@@ -3,8 +3,8 @@ Author: HOKET
 Contributors:hoket,naotoonodera
 Tags: SEO, internal links, content visualization, content analysis, link management
 Requires at least: 4.9
-Tested up to: 6.9
-Stable tag: 1.6.1
+Tested up to: 7.0
+Stable tag: 1.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 7.4
@@ -45,6 +45,13 @@ Simply add the [post_network] shortcode to the page where you want to display th
 
 
 == Changelog ==
+
+= 1.6.2 =
+* Fixed a possible recursive shortcode rendering issue when pages containing Post Network shortcodes are included in the graph.
+* Added an option to control whether shortcodes are executed while scanning content for links.
+* Improved fallback handling for plugin options.
+* Fixed node value calculation when the matched node index is 0.
+* Improved variable initialization and output escaping.
 
 = 1.6.1 =
 * Added support for [post-network] shortcode.
