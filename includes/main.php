@@ -24,7 +24,7 @@ class PostNetwork
 
     public function load_options()
     {
-        $this->options = get_option($this->pn_get_option_name());
+        $this->options = $this->pn_get_options();
     }
 
     public static function get_instance()
@@ -55,6 +55,24 @@ class PostNetwork
         return self::$option_name_sub;
     }
 
+    public static function pn_get_default_options()
+    {
+        $fields = self::pn_get_fields();
+        return array_column($fields, 'default', 'id');
+    }
+
+    private function pn_get_options()
+    {
+        $defaults = self::pn_get_default_options();
+        $options  = get_option($this->pn_get_option_name(), array());
+
+        if (! is_array($options)) {
+            $options = array();
+        }
+
+        return wp_parse_args($options, $defaults);
+    }
+
     /*
     ==================================
     Plugin page
@@ -81,7 +99,7 @@ class PostNetwork
 
     public function pn_page_init()
     {
-        $this->options = get_option($this->pn_get_option_name());
+        $this->options = $this->pn_get_options();
 
         if (isset($_GET['page']) && $_GET['page'] === $this->pn_get_option_name_sub()) {
             add_settings_section('graph', __('Graph settings', 'post-network'), '', $this->pn_get_option_name());
@@ -130,6 +148,10 @@ class PostNetwork
 
     public function pn_create_main_page()
     {
+        $graph_data = $this->pn_build_graph_data();
+        $nodes      = $graph_data['nodes'];
+        $edges      = $graph_data['edges'];
+        $row_data   = $graph_data['row_data'];
     ?>
         <div class="pn-option-setting">
             <div id="pn-loader"></div>
@@ -137,87 +159,17 @@ class PostNetwork
             <div id="pn"></div>
             <table>
                 <tr>
-                    <th><?php esc_attr_e('Post Title', 'post-network'); ?></th>
-                    <th><?php esc_attr_e('Permalink', 'post-network'); ?></th>
-                    <th><?php esc_attr_e('ID', 'post-network'); ?></th>
-                    <th><?php esc_attr_e('Edit', 'post-network'); ?></th>
+                    <th><?php esc_html_e('Post Title', 'post-network'); ?></th>
+                    <th><?php esc_html_e('Permalink', 'post-network'); ?></th>
+                    <th><?php esc_html_e('ID', 'post-network'); ?></th>
+                    <th><?php esc_html_e('Edit', 'post-network'); ?></th>
                 </tr>
-                <?php
-
-                // settings : graph_post_type
-                if ($this->options['graph_post_type']) {
-                    $array_post_type = $this->options['graph_post_type'];
-                } else {
-                    $array_post_type = array('post');
-                }
-
-                // WP＿Query args
-                $args = array(
-                    'post_type'      => $array_post_type,
-                    'posts_per_page' => -1,
-                );
-
-                // settings : graph_post_status
-
-                if (isset($this->options['graph_post_status']) &&  $this->options['graph_post_status']) {
-                    $args = $args + array('post_status' => 'publish');
-                }
-
-                $query = new WP_Query($args);
-
-                $to_post_ids = array();
-                $edges = array();
-
-                if ($query->have_posts()) {
-                    while ($query->have_posts()) {
-                        $query->the_post();
-                        $post      = get_post();
-                        $permalink = get_permalink($post->ID);
-                        $categories = get_the_category($post->ID);
-
-                        $category_id = !empty($categories) && isset($categories[0]->term_id) ? $categories[0]->term_id : 0; // no category
-                        $nodes[] = $this->pn_create_node($post->ID, $category_id);
-
-                        $links     = $this->pn_get_all_links(do_shortcode($post->post_content));
-                        $ids       = $this->pn_urls_to_post_ids($links);
-
-                        if ($ids) {
-                            foreach ($ids as $key => $post_id) {
-                                if (in_array(get_post_type($post_id), $array_post_type, true)) {
-                                    $edges[]       = $this->pn_create_edge($post->ID, $post_id);
-                                    $to_post_ids[] = $post_id;
-                                }
-                            }
-                        }
-
-                        $row_data[] = array(
-                            'id'    => $post->ID,
-                            'title' => $post->post_title,
-                            'link'  => $permalink,
-                        );
-                    }
-
-                    wp_reset_postdata();
-
-                    foreach ($to_post_ids as $to_post_id) {
-                        $key_index = array_search((int) $to_post_id, array_column($nodes, 'id'), true);
-
-                        if ($key_index) {
-                            $value                        = $nodes[$key_index]['value'] + 1;
-                            $nodes[$key_index]['value'] = $value;
-                        }
-                    }
-                }
-                $nodes = apply_filters('post_network_nodes', $nodes);
-                $edges = apply_filters('post_network_edges', $edges);
-                ?>
-
                 <?php foreach ($row_data as $row => $item) : ?>
                     <tr>
-                        <td class="title"><?php esc_attr_e($item['title']); ?></td>
-                        <td class="permalink"><a href="<?php esc_attr_e($item['link']); ?>"><?php esc_attr_e($item['link']); ?></a></td>
-                        <td id="<?php esc_attr_e($item['id']); ?>" class="id"><?php esc_attr_e($item['id']); ?></td>
-                        <td class="edit"><a href="<?php esc_attr_e(home_url() . '/wp-admin/post.php?post=' . $item['id'] . '&action=edit'); ?>"><?php _e('Edit', 'post-network'); ?></a></td>
+                        <td class="title"><?php echo esc_html($item['title']); ?></td>
+                        <td class="permalink"><a href="<?php echo esc_url($item['link']); ?>"><?php echo esc_html($item['link']); ?></a></td>
+                        <td id="<?php echo esc_attr($item['id']); ?>" class="id"><?php echo esc_html($item['id']); ?></td>
+                        <td class="edit"><a href="<?php echo esc_url(get_edit_post_link($item['id'], 'raw')); ?>"><?php esc_html_e('Edit', 'post-network'); ?></a></td>
                     </tr>
                 <?php endforeach; ?>
             </table>
@@ -253,6 +205,9 @@ class PostNetwork
 
     function pn_render_shortcode($atts)
     {
+        $graph_data = $this->pn_build_graph_data();
+        $nodes      = $graph_data['nodes'];
+        $edges      = $graph_data['edges'];
 
         ob_start();
     ?>
@@ -260,76 +215,6 @@ class PostNetwork
             <div id="pn-loader"></div>
 
             <div id="pn"></div>
-
-
-            <?php
-
-            // settings : graph_post_type
-            if ($this->options['graph_post_type']) {
-                $array_post_type = $this->options['graph_post_type'];
-            } else {
-                $array_post_type = array('post');
-            }
-
-            // WP＿Query args
-            $args = array(
-                'post_type'      => $array_post_type,
-                'posts_per_page' => -1,
-            );
-
-            // settings : graph_post_status
-            if (isset($this->options['graph_post_status']) &&  $this->options['graph_post_status']) {
-                $args = $args + array('post_status' => 'publish');
-            }
-
-            $query = new WP_Query($args);
-
-            $to_post_ids = array();
-            $edges = array();
-
-            if ($query->have_posts()) {
-                while ($query->have_posts()) {
-                    $query->the_post();
-                    $post      = get_post();
-                    $permalink = get_permalink($post->ID);
-                    $categories = get_the_category($post->ID);
-
-                    $category_id = !empty($categories) && isset($categories[0]->term_id) ? $categories[0]->term_id : 0; // no category
-                    $nodes[] = $this->pn_create_node($post->ID, $category_id);
-
-                    $links     = $this->pn_get_all_links(do_shortcode($post->post_content));
-                    $ids       = $this->pn_urls_to_post_ids($links);
-
-                    if ($ids) {
-                        foreach ($ids as $key => $post_id) {
-                            if (in_array(get_post_type($post_id), $array_post_type, true)) {
-                                $edges[]       = $this->pn_create_edge($post->ID, $post_id);
-                                $to_post_ids[] = $post_id;
-                            }
-                        }
-                    }
-
-                    $row_data[] = array(
-                        'id'    => $post->ID,
-                        'title' => $post->post_title,
-                        'link'  => $permalink,
-                    );
-                }
-
-                wp_reset_postdata();
-
-                foreach ($to_post_ids as $to_post_id) {
-                    $key_index = array_search((int) $to_post_id, array_column($nodes, 'id'), true);
-
-                    if ($key_index) {
-                        $value                        = $nodes[$key_index]['value'] + 1;
-                        $nodes[$key_index]['value'] = $value;
-                    }
-                }
-            }
-            $nodes = apply_filters('post_network_nodes', $nodes);
-            $edges = apply_filters('post_network_edges', $edges);
-            ?>
 
             <script type="text/javascript">
                 window.pnData = {
@@ -354,6 +239,129 @@ class PostNetwork
         return ob_get_clean();
     }
 
+    private function pn_build_graph_data()
+    {
+        if (! is_array($this->options)) {
+            $this->options = $this->pn_get_options();
+        }
+
+        // settings : graph_post_type
+        if (isset($this->options['graph_post_type']) && is_array($this->options['graph_post_type']) && $this->options['graph_post_type']) {
+            $array_post_type = $this->options['graph_post_type'];
+        } else {
+            $array_post_type = array('post');
+        }
+
+        // WP＿Query args
+        $args = array(
+            'post_type'      => $array_post_type,
+            'posts_per_page' => -1,
+        );
+
+        // settings : graph_post_status
+
+        if (isset($this->options['graph_post_status']) &&  $this->options['graph_post_status']) {
+            $args = $args + array('post_status' => 'publish');
+        }
+
+        $query = new WP_Query($args);
+
+        $to_post_ids = array();
+        $edges       = array();
+        $nodes       = array();
+        $row_data    = array();
+
+        if ($query->have_posts()) {
+            while ($query->have_posts()) {
+                $query->the_post();
+                $post      = get_post();
+                $permalink = get_permalink($post->ID);
+                $categories = get_the_category($post->ID);
+
+                $category_id = !empty($categories) && isset($categories[0]->term_id) ? $categories[0]->term_id : 0; // no category
+                $nodes[] = $this->pn_create_node($post->ID, $category_id);
+
+                $content   = $this->pn_prepare_content_for_link_scan($post->post_content);
+                $links     = $this->pn_get_all_links($content);
+                $ids       = $this->pn_urls_to_post_ids($links);
+
+                if ($ids) {
+                    foreach ($ids as $key => $post_id) {
+                        if (in_array(get_post_type($post_id), $array_post_type, true)) {
+                            $edges[]       = $this->pn_create_edge($post->ID, $post_id);
+                            $to_post_ids[] = $post_id;
+                        }
+                    }
+                }
+
+                $row_data[] = array(
+                    'id'    => $post->ID,
+                    'title' => $post->post_title,
+                    'link'  => $permalink,
+                );
+            }
+
+            wp_reset_postdata();
+
+            foreach ($to_post_ids as $to_post_id) {
+                $key_index = array_search((int) $to_post_id, array_column($nodes, 'id'), true);
+
+                if (false !== $key_index) {
+                    $value                        = $nodes[$key_index]['value'] + 1;
+                    $nodes[$key_index]['value'] = $value;
+                }
+            }
+        }
+        $nodes = apply_filters('post_network_nodes', $nodes);
+        $edges = apply_filters('post_network_edges', $edges);
+
+        return array(
+            'nodes'    => $nodes,
+            'edges'    => $edges,
+            'row_data' => $row_data,
+        );
+    }
+
+    private function pn_prepare_content_for_link_scan($content)
+    {
+        if (isset($this->options['graph_execute_shortcodes']) && $this->options['graph_execute_shortcodes']) {
+            return $this->pn_do_shortcode_for_link_scan($content);
+        }
+
+        return $this->pn_strip_own_shortcodes($content);
+    }
+
+    private function pn_do_shortcode_for_link_scan($content)
+    {
+        global $shortcode_tags;
+
+        $disabled_tags      = array('post_network', 'post-network');
+        $original_callbacks = array();
+
+        foreach ($disabled_tags as $tag) {
+            if (isset($shortcode_tags[$tag])) {
+                $original_callbacks[$tag] = $shortcode_tags[$tag];
+                add_shortcode($tag, '__return_empty_string');
+            }
+        }
+
+        try {
+            return do_shortcode((string) $content);
+        } finally {
+            foreach ($original_callbacks as $tag => $callback) {
+                add_shortcode($tag, $callback);
+            }
+        }
+    }
+
+    private function pn_strip_own_shortcodes($content)
+    {
+        $content = (string) $content;
+        $pattern = get_shortcode_regex(array('post_network', 'post-network'));
+
+        return preg_replace('/' . $pattern . '/s', '', $content);
+    }
+
 
     /**
      * Create node
@@ -371,9 +379,11 @@ class PostNetwork
 
         );
 
-        if ('post_title' === $this->options['graph_label']) {
+        $graph_label = isset($this->options['graph_label']) ? $this->options['graph_label'] : 'post_id';
+
+        if ('post_title' === $graph_label) {
             $array = $array + array('label' => (string) get_the_title($post_id));
-        } elseif ('post_id' === $this->options['graph_label']) {
+        } elseif ('post_id' === $graph_label) {
             $array = $array + array('label' => (string) $post_id);
             $array = $array + array('title' => get_the_title($post_id));
         } else { // none
@@ -382,7 +392,7 @@ class PostNetwork
         }
 
         // settings : graph_indicate_post_status
-        if ('none' != $this->options['graph_label'] && isset($this->options['graph_indicate_post_status']) && $this->options['graph_indicate_post_status']) {
+        if ('none' != $graph_label && isset($this->options['graph_indicate_post_status']) && $this->options['graph_indicate_post_status']) {
             $array['label'] = $array['label'] . ' (' . get_post_status($post_id) . ')';
         }
 
@@ -433,8 +443,12 @@ class PostNetwork
     {
         $existing = get_option($this->pn_get_option_name());
 
-        if (! $existing) {
-            return $input;
+        if (! is_array($existing)) {
+            $existing = array();
+        }
+
+        if (! is_array($input)) {
+            $input = array();
         }
 
         $return = array_merge($existing, $input);
@@ -685,6 +699,13 @@ class PostNetwork
                 'default'    => 0,
             ),
             array(
+                'id'         => 'graph_execute_shortcodes',
+                'title'      => __('Execute shortcodes while scanning content', 'post-network'),
+                'callback'   => 'pn_boolean_callback',
+                'section_id' => 'graph',
+                'default'    => 1,
+            ),
+            array(
                 'id'         => 'graph_post_type',
                 'title'      => __('Post type to include', 'post-network'),
                 'callback'   => 'pn_checkbox_callback',
@@ -699,8 +720,7 @@ class PostNetwork
 
     public static function pn_option_init()
     {
-        $fields           = self::pn_get_fields();
-        $default_settings = array_column($fields, 'default', 'id');
+        $default_settings = self::pn_get_default_options();
         update_option(self::$option_name, $default_settings);
     }
 
@@ -736,11 +756,11 @@ class PostNetwork
 
     public function pn_boolean_callback($args)
     {
-        $option_value = isset($this->options[$args['id']]) ? esc_attr($this->options[$args['id']]) : '';
+        $option_value = isset($this->options[$args['id']]) ? $this->options[$args['id']] : '';
         ?>
 
         <input type="hidden" name="<?php echo esc_attr($this->pn_get_option_name()); ?>[<?php echo esc_attr($args['id']); ?>]" value="0">
-        <input type="checkbox" id="<?php echo esc_attr($args['id']); ?>" name="<?php echo esc_attr($this->pn_get_option_name()); ?>[<?php echo esc_attr($args['id']); ?>]" value="1" <?php checked($this->options[$args['id']], 1); ?>>
+        <input type="checkbox" id="<?php echo esc_attr($args['id']); ?>" name="<?php echo esc_attr($this->pn_get_option_name()); ?>[<?php echo esc_attr($args['id']); ?>]" value="1" <?php checked($option_value, 1); ?>>
         <?php if (! empty($args['description'])) : ?>
             <p><?php echo esc_attr($args['description']); ?></p>
         <?php
